@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"memeboard/handlers"
 	"memeboard/models"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -11,8 +12,21 @@ import (
 	"gorm.io/gorm"
 )
 
+func getEnv(key, Default string) string {
+	ret := os.Getenv(key)
+	if ret == "" {
+		return Default
+	}
+	return ret
+}
 func main() {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Taipei", "localhost", "memeboard_user", "cchs91193", "memeboard", "5432")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Taipei",
+		getEnv("DB_HOST", "localhost"),
+		getEnv("DB_USER", "memeboard_user"),
+		getEnv("DB_PASSWORD", "password"),
+		getEnv("DB_NAME", "memeboard"),
+		getEnv("DB_PORT", "5432"),
+	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println("connect db failed", err)
@@ -38,7 +52,8 @@ func main() {
 		api.PUT("/memeinfo", memeInfo.UpdateMemeInfo)
 		api.DELETE("/memeinfo/:id", memeInfo.DeleteMeme)
 	}
-	if err := r.Run("127.0.0.1:8080"); err != nil {
+	port := getEnv("PORT", "8080")
+	if err := r.Run(":" + port); err != nil {
 		fmt.Println("failed to run server", err)
 		return
 	}
