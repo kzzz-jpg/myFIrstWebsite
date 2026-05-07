@@ -1,0 +1,12 @@
+:root{
+  --header-bg-color: #FFE6D9;
+}
+html,body{
+  height: 100%;
+  margin: 0;
+}
+#app{
+  overflow: hidden;
+  height: 100%;
+  width:100%;
+}
